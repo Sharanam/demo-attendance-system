@@ -83,12 +83,34 @@ The repository includes a secure setup and seeding endpoint at `/api/db/init` to
 3. Click **Connect Database** or **Create Database** and select **Blob**.
 4. Click **Create** to initialize a new Vercel Blob store. Vercel automatically exposes the `BLOB_READ_WRITE_TOKEN` to your project environment.
 
-### Initializing and Seeding:
+### Initializing and Seeding (Single User):
 Once basic auth credentials are input, visit the URL below in your browser to write the initial attendees file and seed your Google email:
 ```
 https://your-domain.vercel.app/api/db/init?secret=YOUR_BASIC_AUTH_PASSWORD&email=YOUR_GOOGLE_EMAIL@gmail.com&code=12345&name=Sharanam%20Chotai
 ```
 *Note: Make sure `secret` matches the `BASIC_AUTH_PASSWORD` environment variable.*
+
+### Bulk Seeding (250+ Users):
+You can bulk-upload a list of attendees by sending a secure `POST` request to the `/api/db/init?secret=YOUR_BASIC_AUTH_PASSWORD` route with the JSON array as the request body. 
+
+Each attendee object must contain `email`, `unique_code` (integer), and `name`.
+
+#### Example cURL Request (Bash/CLI):
+```bash
+curl -X POST "https://your-domain.vercel.app/api/db/init?secret=YOUR_BASIC_AUTH_PASSWORD" \
+     -H "Content-Type: application/json" \
+     -d '[
+       {"email": "sharanam@example.com", "unique_code": 10001, "name": "Sharanam Chotai"},
+       {"email": "alex@example.com", "unique_code": 10002, "name": "Alex Johnson"}
+     ]'
+```
+
+#### Example PowerShell Request (Windows CLI):
+If you have a local JSON file named `attendees.json` containing your 250+ rows:
+```powershell
+$body = Get-Content -Raw -Path ./attendees.json
+Invoke-RestMethod -Uri "https://your-domain.vercel.app/api/db/init?secret=YOUR_BASIC_AUTH_PASSWORD" -Method Post -Body $body -ContentType "application/json"
+```
 
 ---
 

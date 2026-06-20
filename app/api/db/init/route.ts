@@ -98,3 +98,59 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function POST(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const adminSecret = searchParams.get('secret');
+
+  const validSecret = process.env.BASIC_AUTH_PASSWORD;
+
+  // Simple security check using BASIC_AUTH_PASSWORD
+  if (!validSecret || adminSecret !== validSecret) {
+    return NextResponse.json(
+      { error: 'Unauthorized. Please provide the correct secret query param matching your BASIC_AUTH_PASSWORD: ?secret=...' },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const data = await request.json();
+    if (!Array.isArray(data)) {
+      return NextResponse.json(
+        { error: 'Invalid request body. Expected a JSON array of attendees.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate and format each row in the array
+    const formattedAttendees: Attendee[] = data.map((item: any, index: number) => {
+      if (!item.email || item.unique_code === undefined || !item.name) {
+        throw new Error(`Row at index ${index} is missing required fields (email, unique_code, name)`);
+      }
+      const code = parseInt(item.unique_code, 10);
+      if (isNaN(code)) {
+        throw new Error(`Row at index ${index} has an invalid non-integer code: ${item.unique_code}`);
+      }
+      return {
+        id: index + 1,
+        email: String(item.email).trim().toLowerCase(),
+        unique_code: code,
+        name: String(item.name).trim(),
+      };
+    });
+
+    const success = await writeAttendeesList(formattedAttendees);
+    if (!success) {
+      throw new Error('Failed to write bulk attendees list to Vercel Blob.');
+    }
+
+    return NextResponse.json({
+      message: 'Bulk attendees list imported successfully!',
+      importedCount: formattedAttendees.length,
+    });
+
+  } catch (error: any) {
+    console.error('Bulk import error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
