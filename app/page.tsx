@@ -1,6 +1,7 @@
 import { getSessionUser } from '@/lib/auth';
 import { getAttendanceLogsForUser } from '@/lib/db';
 import AttendanceForm from './AttendanceForm';
+import ThemeToggle from './ThemeToggle';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -14,9 +15,10 @@ export default async function Home({ searchParams }: PageProps) {
   // Render landing page if user is not logged in
   if (!user) {
     return (
-      <div className="flex-1 flex flex-col justify-between p-6 md:p-12 max-w-5xl mx-auto w-full">
-        {/* Empty header for spacing */}
-        <div />
+      <div className="flex-1 flex flex-col justify-between p-6 md:p-12 max-w-5xl mx-auto w-full relative">
+        <div className="flex justify-end w-full">
+          <ThemeToggle />
+        </div>
 
         {/* Neumorphic Landing Card */}
         <div className="w-full max-w-md mx-auto flex flex-col items-center gap-8 py-12">
@@ -103,6 +105,7 @@ export default async function Home({ searchParams }: PageProps) {
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <span className="text-xs text-zinc-400 dark:text-zinc-500 select-all font-mono">{user.email}</span>
+          <ThemeToggle />
           <a
             href="/api/auth/logout"
             className="neu-btn px-5 py-2.5 text-sm font-bold text-red-500 dark:text-red-400 hover:text-red-600 w-full sm:w-auto text-center"

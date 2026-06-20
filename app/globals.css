@@ -124,3 +124,15 @@ body {
   box-shadow: var(--neu-in);
   color: var(--neu-accent);
 }
+
+/* Force light/white theme variables when data-theme="light" is applied to html */
+html[data-theme="light"] {
+  --background: #e0e5ec;
+  --foreground: #2d3748;
+  --neu-out: 8px 8px 16px #b8bec9, -8px -8px 16px #ffffff;
+  --neu-in: inset 4px 4px 8px #b8bec9, inset -4px -4px 8px #ffffff;
+  --neu-flat: #e0e5ec;
+  --neu-border: rgba(255, 255, 255, 0.5);
+  --neu-accent: #4a90e2;
+  --neu-accent-shadow: 4px 4px 8px #cbd3e0, -4px -4px 8px #ffffff;
+}
