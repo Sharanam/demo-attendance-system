@@ -27,7 +27,7 @@ export function decrypt(token: string): any | null {
     const parts = token.split(':');
     if (parts.length !== 2) return null;
     const iv = Buffer.from(parts[0], 'hex');
-    const encryptedText = Buffer.from(parts[1], 'hex');
+    const encryptedText = parts[1];
     const key = getSessionKey();
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
     let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
